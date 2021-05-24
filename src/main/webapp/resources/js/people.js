@@ -6,10 +6,7 @@ var personInputSelector = "[aria-labelledby='metadata_keyword']";
 
 var versionSelection = undefined;
 $(document).ready(function () {
-  getData().then((data) => {
-    expandPeople();
-    updatePeopleInputs(data);
-  });
+  FoRcode();
   console.log("ForCode Test");
 });
 
@@ -79,11 +76,16 @@ function expandPeople() {
     }
   });
 }
-
+function FoRcode() {
+  getData().then((data) => {
+    expandPeople();
+    updatePeopleInputs(data);
+  });
+}
 function getData() {
   console.log(versionSelection);
   return new Promise((resolve, reject) => {
-    fetch("http://localhost:3009/api/forCode")
+    fetch("http://localhost:3000/api/forCode")
       //
       .then((dd) => dd.status === 201 && dd.json())
       .then((data) => resolve(data))
