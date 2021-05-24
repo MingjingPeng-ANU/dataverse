@@ -1,10 +1,13 @@
 var personSelector = ".person";
 var personInputSelector = "[aria-labelledby='metadata_keyword']";
 
+//var personSelector = ".person";
+//var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
+
 var versionSelection = undefined;
 $(document).ready(function () {
   getData().then((data) => {
-    //expandPeople();
+    expandPeople();
     updatePeopleInputs(data);
   });
   console.log("ForCode Test");
@@ -129,10 +132,10 @@ function updatePeopleInputs(data) {
   console.log("91", data);
   var num = 0;
   //For each input element within personInputSelector elements
+  console.log("132", $(personInputSelector).find("input"));
   $(personInputSelector)
     .find("input")
     .each(function (index, ele) {
-    console.log("135", index)
       var personInput = this;
       num = num + 1;
       $(personInput).attr("data-person", num);
