@@ -1,11 +1,12 @@
 var personSelector = ".person";
-var personInputSelector = "[aria-labelledby='metadata_creator']";
-var data = undefined;
+var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
 
+var versionSelection = undefined;
 $(document).ready(function () {
-  expandPeople();
-  updatePeopleInputs();
-  getData();
+  getData().then((data) => {
+    //expandPeople();
+    updatePeopleInputs(data);
+  });
   console.log("ForCode Test");
 });
 
@@ -76,176 +77,140 @@ function expandPeople() {
   });
 }
 
-async function getData() {
+function getData() {
+  console.log(versionSelection);
   return new Promise((resolve, reject) => {
     fetch("http://localhost:3000/api/forCode")
       //
       .then((dd) => dd.status === 201 && dd.json())
-      .then((data) => console.log(data))
+      .then((data) => resolve(data))
       .catch((err) => console.log(err));
   });
 }
-function updatePeopleInputs() {
+
+function select2Config(index, data, selectId) {
+  if (index % 3 === 0) {
+    return $("#" + selectId).select2({
+      theme: "bootstrap",
+      width: "500px",
+      //tags: true,
+      delay: 500,
+      language: {
+        searching: function (params) {
+          // Change this to be appropriate for your application
+          return "Search by name, email, or ORCID�";
+        },
+      },
+      placeholder: "FoR Code version",
+      minimumInputLength: 0,
+      allowClear: true,
+      data: data.voca,
+    });
+  } else if (index % 3 === 1) {
+    return $("#" + selectId).select2({
+      theme: "bootstrap",
+      width: "500px",
+      //tags: true,
+      delay: 500,
+      language: {
+        searching: function (params) {
+          // Change this to be appropriate for your application
+          return "Search by name, email, or ORCID�";
+        },
+      },
+      placeholder: "FoR Code terms",
+      minimumInputLength: 0,
+      allowClear: true,
+      data: [],
+    });
+  }
+}
+function updatePeopleInputs(data) {
+  console.log("91", data);
   var num = 0;
   //For each input element within personInputSelector elements
   $(personInputSelector)
     .find("input")
-    .each(function () {
+    .each(function (index, ele) {
       var personInput = this;
       num = num + 1;
-      //Hide the actual input and give it a data-person number so we can find it
-      $(personInput).hide();
       $(personInput).attr("data-person", num);
-      //Add a select2 element to allow search and provide a list of choices
-      var selectId = "creatorAddSelect_" + num;
-      $(personInput).after(
-        "<select id=" +
-          selectId +
-          ' class="form-control add-resource select2" tabindex="-1" aria-hidden="true">'
-      );
-      $("#" + selectId).select2({
-        theme: "bootstrap",
-        width: "500px",
-        tags: true,
-        delay: 500,
-        templateResult: function (item) {
-          // No need to template the searching text
-          if (item.loading) {
-            return item.text;
-          }
-          var term = "";
-          if (typeof query !== "undefined") {
-            term = query.term;
-          }
+      //Hide the actual input and give it a data-person number so we can find it
+      if (index % 3 !== 2) {
+        $(personInput).hide();
+        //$(personInput).attr("data-person", num);
+        //Add a select2 element to allow search and provide a list of choices
+        var selectId = "FoRcodeAddSelect_" + num;
+        $(personInput).after(
+          "<select id=" +
+            selectId +
+            ' class="form-control add-resource select2" tabindex="-1" aria-hidden="true">'
+        );
+        {
+          select2Config(index, data, selectId);
+        }
+      }
 
-          //markMatch bolds the search term if/where it appears in the result
-          var $result = markMatch(item.text, term);
-          return $result;
-        },
-        templateSelection: function (item) {
-          //For a selection, add HTML to make the ORCID a link
-          var pos = item.text.search(/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/);
-          if (pos >= 0) {
-            var orcid = item.text.substr(pos, 19);
-            return $("<span></span>").append(
-              item.text.replace(
-                orcid,
-                "<a href='https://orcid.org/" + orcid + "'>" + orcid + "</a>"
-              )
-            );
-          }
-          return item.text;
-        },
-        language: {
-          searching: function (params) {
-            // Change this to be appropriate for your application
-            return "Search by name, email, or ORCID�";
-          },
-        },
-        placeholder: "Add a Creator",
-        minimumInputLength: 3,
-        allowClear: true,
-        ajax: {
-          //Use an ajax call to ORCID to retrieve matching results
-          url: function (params) {
-            var term = params.term;
-            if (!term) {
-              term = "";
-            }
-            //Use expanded-search to get the names, email directly in the results
-            return "https://pub.orcid.org/v3.0/expanded-search";
-          },
-          data: function (params) {
-            var term = params.term;
-            if (!term) {
-              term = "";
-            }
-            var query = {
-              q: term,
-              rows: 10,
-            };
-            return query;
-          },
-          //request json (vs XML default)
-          headers: { Accept: "application/json" },
-          processResults: function (data, page) {
-            return {
-              results: data["expanded-result"]
-                //Sort to bring recently used ORCIDS to the top of the list
-                .sort((a, b) => (localStorage.getItem(b["orcid-id"]) ? 1 : -1))
-                .map(function (x) {
-                  return {
-                    text:
-                      x["given-names"] +
-                      " " +
-                      x["family-names"] +
-                      ", " +
-                      x["orcid-id"] +
-                      (x.email.length > 0 ? ", " + x.email[0] : ""),
-                    id: x["orcid-id"],
-                    //Since clicking in the selection re-opens the choice list, one has to use a right click/open in new tab/window to view the ORCID page
-                    //Using title to provide that hint as a popup
-                    title: "Open in new tab to view ORCID page",
-                  };
-                }),
-            };
-          },
-        },
-      });
       //If the input has a value already, format it the same way as if it were a new selection
       var id = $(personInput).val();
-      if (id.startsWith("https://orcid.org")) {
-        id = id.substring(18);
-        $.ajax({
-          type: "GET",
-          url: "https://pub.orcid.org/v3.0/" + id + "/person",
-          dataType: "json",
-          headers: { Accept: "application/json" },
-          success: function (person, status) {
-            var name =
-              person.name["given-names"].value +
-              " " +
-              person.name["family-name"].value;
-            var text = name + ", " + id;
-            if (person.emails.email.length > 0) {
-              text = text + ", " + person.emails.email[0].email;
-            }
-            var newOption = new Option(text, id, true, true);
-            newOption.title = "Open in new tab to view ORCID page";
-            $("#" + selectId)
-              .append(newOption)
-              .trigger("change");
-          },
-          failure: function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status != 404) {
-              console.error(
-                "The following error occurred: " + textStatus,
-                errorThrown
-              );
-            }
-          },
-        });
-      } else {
-        //If the initial value is not an ORCID (legacy, or if tags are enabled), just display it as is
-        var newOption = new Option(id, id, true, true);
-        $("#" + selectId)
-          .append(newOption)
-          .trigger("change");
-      }
+      console.log("306", num);
+
+      //If the initial value is not an ORCID (legacy, or if tags are enabled), just display it as is
+      var newOption = new Option(id, id, true, true);
+      $("#" + selectId)
+        .append(newOption)
+        .trigger("change");
+
       //Could start with the selection menu open
       //    $("#" + selectId).select2('open');
       //When a selection is made, set the value of the hidden input field
       $("#" + selectId).on("select2:select", function (e) {
-        var data = e.params.data;
+        var content = e.params.data;
 
-        //For ORCIDs, the id and text are different
-        if (data.id != data.text) {
-          $("input[data-person='" + num + "']").val(
-            "https://orcid.org/" + data.id
-          );
-        } else {
-          //Tags are allowed, so just enter the text as is
-          $("input[data-person='" + num + "']").val(data.id);
+        const currentItemIndex = parseInt(
+          selectId.split("FoRcodeAddSelect_")[1]
+        );
+        console.log("167", selectId, content.text, currentItemIndex);
+        if (currentItemIndex % 3 === 1) {
+          const termSelectIndex = `FoRcodeAddSelect_${currentItemIndex + 1}`;
+          const urlIndex = currentItemIndex + 2;
+          const termIndex = currentItemIndex + 1;
+          //console.log(data.term[content.text]);
+          $("input[data-person='" + termIndex + "']").val(null);
+          $("input[data-person='" + urlIndex + "']").val(null);
+          $("#" + termSelectIndex)
+            .val(null)
+            .trigger("change");
+          $("#" + termSelectIndex).html("<option></option>");
+          $("#" + termSelectIndex).select2({
+            theme: "bootstrap",
+            width: "500px",
+            //tags: true,
+            delay: 500,
+            language: {
+              searching: function (params) {
+                // Change this to be appropriate for your application
+                return "Search by name, email, or ORCID�";
+              },
+            },
+            placeholder: "FoR Code terms",
+            minimumInputLength: 0,
+            allowClear: true,
+            data: data.term[content.text],
+          });
+        }
+        console.log("170", currentItemIndex);
+        $("input[data-person='" + currentItemIndex + "']").val(content.text);
+        if (currentItemIndex % 3 === 2) {
+          const urlIndex = currentItemIndex + 1;
+          //console.log("206", content.text.split(": ")[2].split("/"));
+          let vocaURLArray = content.text.split(": ")[2].split("/");
+          //console.log("207", vocaURLArray[6]);
+          vocaURLArray[6] = vocaURLArray[6].substring(0, 2);
+          console.log("209", vocaURLArray);
+          const vocaURL = vocaURLArray.join("/");
+          console.log("voca", vocaURL);
+          $("input[data-person='" + urlIndex + "']").val(vocaURL);
         }
       });
       //When a selection is cleared, clear the hidden input
@@ -258,9 +223,11 @@ function updatePeopleInputs() {
 //Put the text in a result that matches the term in a span with class select2-rendered__match that can be styled (e.g. bold)
 function markMatch(text, term) {
   // Find where the match is
+  console.log("340", text);
   var match = text.toUpperCase().indexOf(term.toUpperCase());
   var $result = $("<span></span>");
   // If there is no match, move on
+  console.log("343", match);
   if (match < 0) {
     return $result.text(text);
   }
@@ -280,4 +247,3 @@ function markMatch(text, term) {
 
   return $result;
 }
-
