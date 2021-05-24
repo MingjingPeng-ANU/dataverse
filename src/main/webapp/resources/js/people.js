@@ -1,5 +1,5 @@
 var personSelector = ".person";
-var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
+var personInputSelector = "[aria-labelledby='metadata_keyword']";
 
 var versionSelection = undefined;
 $(document).ready(function () {
