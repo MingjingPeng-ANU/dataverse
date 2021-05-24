@@ -132,6 +132,7 @@ function updatePeopleInputs(data) {
   $(personInputSelector)
     .find("input")
     .each(function (index, ele) {
+    console.log("135", index)
       var personInput = this;
       num = num + 1;
       $(personInput).attr("data-person", num);
