@@ -83,7 +83,7 @@ function expandPeople() {
 function getData() {
   console.log(versionSelection);
   return new Promise((resolve, reject) => {
-    fetch("http://localhost:3000/api/forCode")
+    fetch("http://localhost:3009/api/forCode")
       //
       .then((dd) => dd.status === 201 && dd.json())
       .then((data) => resolve(data))
@@ -92,6 +92,7 @@ function getData() {
 }
 
 function select2Config(index, data, selectId) {
+  console.log("92", index, data, selectId);
   if (index % 3 === 0) {
     return $("#" + selectId).select2({
       theme: "bootstrap",
