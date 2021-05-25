@@ -2469,7 +2469,7 @@ progress::-webkit-progress-value {
   border-radius: 3px;
   display: inline-block;
   background: #ffffff;
-  width: 300px;
+  width: 278px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
