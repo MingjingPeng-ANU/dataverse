@@ -109,7 +109,7 @@ function select2Config(index, data, selectId) {
       },
       placeholder: "FoR Code version",
       minimumInputLength: 0,
-      allowClear: true,
+      allowClear: false,
       data: data.voca,
     });
   } else if (index % 3 === 1) {
@@ -126,7 +126,7 @@ function select2Config(index, data, selectId) {
       },
       placeholder: "FoR Code terms",
       minimumInputLength: 0,
-      allowClear: true,
+      allowClear: false,
       data: [],
     });
   }
@@ -151,7 +151,8 @@ function updatePeopleInputs(data) {
         $(personInput).after(
           "<select id=" +
             selectId +
-            ' class="form-control add-resource select2" tabindex="-1" aria-hidden="true">'
+            ' class="form-control add-resource select2" tabindex="-1" style="width:30%" aria-hidden="true">',
+           
         );
         {
           select2Config(index, data, selectId);
@@ -189,9 +190,10 @@ function updatePeopleInputs(data) {
             .val(null)
             .trigger("change");
           $("#" + termSelectIndex).html("<option></option>");
+          $("#" + termSelectIndex).attr("width","200")
           $("#" + termSelectIndex).select2({
             theme: "bootstrap",
-            width: "500px",
+            width: "500",
             //tags: true,
             delay: 500,
             language: {
@@ -202,7 +204,7 @@ function updatePeopleInputs(data) {
             },
             placeholder: "FoR Code terms",
             minimumInputLength: 0,
-            allowClear: true,
+            allowClear: false,
             data: data.term[content.text],
           });
         }
