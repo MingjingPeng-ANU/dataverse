@@ -2471,6 +2471,7 @@ progress::-webkit-progress-value {
   background: #ffffff;
   width: 278px;
   overflow: hidden;
+  height: 34px;
   text-overflow: ellipsis;
 }
 .select2-container {
