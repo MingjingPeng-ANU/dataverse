@@ -1607,7 +1607,7 @@
                     styleClass="btn btn-default btn-access"
                     actionListener="#{DatasetPage.edit('METADATA')}"
                     update="@form,:messagePanel"
-                    oncomplete="javascript:bind_bsui_components();"
+                    oncomplete="javascript:bind_bsui_components();FoRcode()"
                     disabled="#{DatasetPage.lockedFromEdits}"
                     rendered="#{!widgetWrapper.widgetView 
                                                                and (DatasetPage.sessionUserAuthenticated 
