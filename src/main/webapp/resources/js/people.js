@@ -1,8 +1,8 @@
-var personSelector = ".person";
-var personInputSelector = "[aria-labelledby='metadata_keyword']";
-
 //var personSelector = ".person";
-//var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
+//var personInputSelector = "[aria-labelledby='metadata_keyword']";
+
+var personSelector = ".person";
+var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
 
 var versionSelection = undefined;
 $(document).ready(function () {
@@ -150,8 +150,7 @@ function updatePeopleInputs(data) {
         $(personInput).after(
           "<select id=" +
             selectId +
-            ' class="form-control add-resource select2" tabindex="-1" style="width:30%" aria-hidden="true">',
-           
+            ' class="form-control add-resource select2" tabindex="-1" style="width:30%" aria-hidden="true">'
         );
         {
           select2Config(index, data, selectId);
@@ -189,7 +188,7 @@ function updatePeopleInputs(data) {
             .val(null)
             .trigger("change");
           $("#" + termSelectIndex).html("<option></option>");
-          $("#" + termSelectIndex).attr("width","200")
+          $("#" + termSelectIndex).attr("width", "200");
           $("#" + termSelectIndex).select2({
             theme: "bootstrap",
             width: "500",
@@ -214,8 +213,10 @@ function updatePeopleInputs(data) {
           //console.log("206", content.text.split(": ")[2].split("/"));
           let vocaURLArray = content.text.split(": ")[2].split("/");
           //console.log("207", vocaURLArray[6]);
-          vocaURLArray[6] = vocaURLArray[6].substring(0, 2);
-          console.log("209", vocaURLArray);
+          vocaURLArray[vocaURLArray.length - 1] = vocaURLArray[
+            vocaURLArray.length - 1
+          ].substring(0, 2);
+          //console.log("209", vocaURLArray);
           const vocaURL = vocaURLArray.join("/");
           console.log("voca", vocaURL);
           $("input[data-person='" + urlIndex + "']").val(vocaURL);
