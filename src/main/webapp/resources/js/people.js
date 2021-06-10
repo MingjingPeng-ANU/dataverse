@@ -7,7 +7,6 @@ var personInputSelector = "[aria-labelledby='metadata_topicClassification']";
 var versionSelection = undefined;
 $(document).ready(function () {
   FoRcode();
-  console.log("ForCode Test");
 });
 
 function expandPeople() {
@@ -19,7 +18,6 @@ function expandPeople() {
       //Mark it as processed
       $(personElement).addClass("expanded");
       var id = personElement.textContent;
-      console.log("id: ", id);
       if (id.startsWith("https://orcid.org/")) {
         id = id.substring(18);
       }
@@ -83,7 +81,6 @@ function FoRcode() {
   });
 }
 function getData() {
-  console.log(versionSelection);
   return new Promise((resolve, reject) => {
     fetch("https://dataverse-tools.ada.edu.au/api/forCode")
       .then((dd) => dd.status === 201 && dd.json())
@@ -93,7 +90,6 @@ function getData() {
 }
 
 function select2Config(index, data, selectId) {
-  console.log("92", index, data, selectId);
   if (index % 3 === 0) {
     return $("#" + selectId).select2({
       theme: "bootstrap",
@@ -131,10 +127,8 @@ function select2Config(index, data, selectId) {
   }
 }
 function updatePeopleInputs(data) {
-  console.log("91", data);
   var num = 0;
   //For each input element within personInputSelector elements
-  console.log("132", $(personInputSelector).find("input"));
   $(personInputSelector)
     .find("input")
     .each(function (index, ele) {
@@ -159,8 +153,6 @@ function updatePeopleInputs(data) {
 
       //If the input has a value already, format it the same way as if it were a new selection
       var id = $(personInput).val();
-      console.log("306", num);
-
       //If the initial value is not an ORCID (legacy, or if tags are enabled), just display it as is
       var newOption = new Option(id, id, true, true);
       $("#" + selectId)
@@ -176,12 +168,11 @@ function updatePeopleInputs(data) {
         const currentItemIndex = parseInt(
           selectId.split("FoRcodeAddSelect_")[1]
         );
-        console.log("167", selectId, content.text, currentItemIndex);
         if (currentItemIndex % 3 === 1) {
           const termSelectIndex = `FoRcodeAddSelect_${currentItemIndex + 1}`;
           const urlIndex = currentItemIndex + 2;
           const termIndex = currentItemIndex + 1;
-          //console.log(data.term[content.text]);
+
           $("input[data-person='" + termIndex + "']").val(null);
           $("input[data-person='" + urlIndex + "']").val(null);
           $("#" + termSelectIndex)
@@ -206,19 +197,15 @@ function updatePeopleInputs(data) {
             data: data.term[content.text],
           });
         }
-        console.log("170", currentItemIndex);
+
         $("input[data-person='" + currentItemIndex + "']").val(content.text);
         if (currentItemIndex % 3 === 2) {
           const urlIndex = currentItemIndex + 1;
-          //console.log("206", content.text.split(": ")[2].split("/"));
           let vocaURLArray = content.text.split(": ")[2].split("/");
-          //console.log("207", vocaURLArray[6]);
           vocaURLArray[vocaURLArray.length - 1] = vocaURLArray[
             vocaURLArray.length - 1
           ].substring(0, 2);
-          //console.log("209", vocaURLArray);
           const vocaURL = vocaURLArray.join("/");
-          console.log("voca", vocaURL);
           $("input[data-person='" + urlIndex + "']").val(vocaURL);
         }
       });
@@ -232,11 +219,9 @@ function updatePeopleInputs(data) {
 //Put the text in a result that matches the term in a span with class select2-rendered__match that can be styled (e.g. bold)
 function markMatch(text, term) {
   // Find where the match is
-  console.log("340", text);
   var match = text.toUpperCase().indexOf(term.toUpperCase());
   var $result = $("<span></span>");
   // If there is no match, move on
-  console.log("343", match);
   if (match < 0) {
     return $result.text(text);
   }
